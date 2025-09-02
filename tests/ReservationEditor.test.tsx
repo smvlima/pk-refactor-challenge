@@ -2,8 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ReservationEditor from '../src/components/ReservationEditor'
 
-// NOTE: One test is intentionally failing to nudge refactors
-
 function assertText(rx: RegExp) {
   expect(screen.getByText(rx)).toBeInTheDocument()
 }
@@ -24,9 +22,6 @@ test('changing nights updates total', async () => {
   await userEvent.type(nights, '3')
   assertText(/total: \$130/i) // 40*3 + 10
 })
-
-// Intentionally failing until the error message uses role="alert"
-// (Good refactor adds semantics & focus management.)
 
 test('error messages are announced to assistive tech', async () => {
   render(<ReservationEditor id="abc123" />)

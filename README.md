@@ -24,3 +24,4 @@ npm i
 npm run dev
 # tests
 npm test
+```
