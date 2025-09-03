@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { getReservation, saveReservation } from '../api/fakeApi'
 
-// Types
 interface ReservationEditorProps {
   id: string
 }
 
-interface ReservationData {
+export interface ReservationData {
   id: string
   guestName: string
   basePrice: number // per night
@@ -13,80 +13,44 @@ interface ReservationData {
   fees: number // flat
 }
 
-// Utilities
 const currency = (n: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n)
 
-const clampInt = (v: string, min = 0, max = 365) => {
-  const n = Number(v.replace(/[^0-9]/g, ''))
-  if (Number.isNaN(n)) return min
-  return Math.max(min, Math.min(max, n))
-}
-
-// Simulated API (replace with real api client)
-async function fetchReservation(id: string): Promise<ReservationData> {
-  // Mocked data for the challenge/tests
-  await new Promise(r => setTimeout(r, 150))
-  return {
-    id,
-    guestName: 'Ada Lovelace',
-    basePrice: 40,
-    nights: 2,
-    fees: 10,
-  }
-}
-
-// Component
 const ReservationEditor: React.FC<ReservationEditorProps> = ({ id }) => {
-  // Remote data
   const [data, setData] = useState<ReservationData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Local editable fields
   const [guestName, setGuestName] = useState('')
   const [nights, setNights] = useState(1)
-
-  // Validation + a11y
   const [formError, setFormError] = useState<string | null>(null)
+  const [total, setTotal] = useState(0)
   const alertRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
-    let mounted = true
+  if (!data && !loading) {
     setLoading(true)
-    fetchReservation(id)
-      .then(res => {
-        if (!mounted) return
-        setData(res)
-        setGuestName(res.guestName)
-        setNights(res.nights)
-      })
-      .catch(() => mounted && setError('Failed to load reservation'))
-      .finally(() => mounted && setLoading(false))
-    return () => {
-      mounted = false
-    }
-  }, [id])
-
-  const total = useMemo(() => {
-    const base = (data?.basePrice ?? 0) * nights
-    const fees = data?.fees ?? 0
-    return base + fees
-  }, [data, nights])
-
-  const handleSave = async () => {
-    // simple client-side validation
-    if (!guestName.trim()) {
-      setFormError('Guest name is required')
-      // Move focus to the alert for assistive tech
-      requestAnimationFrame(() => alertRef.current?.focus())
-      return
-    }
-    setFormError(null)
-    // Pretend to save
-    await new Promise(r => setTimeout(r, 150))
+    getReservation(id).then((r: any) => {
+      setData(r)
+      setNights(r?.nights || 1)
+      setLoading(false)
+    })
   }
 
-  // UI
+  useEffect(() => {
+    if (data) {
+      setTotal((data.basePrice || 0) * nights + (data.fees || 0))
+    }
+  }, [nights])
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    const payload = { ...data, nights, total }
+    saveReservation(payload)
+      .then(() => alert('saved'))
+      .catch((err: any) => setError(err?.message || 'failed'))
+      .finally(() => setLoading(false))
+  }
+
   if (loading) {
     return (
       <div className='w-full max-w-xl mx-auto p-4'>
@@ -147,8 +111,8 @@ const ReservationEditor: React.FC<ReservationEditorProps> = ({ id }) => {
             aria-label='Nights'
             inputMode='numeric'
             value={String(nights)}
-            onChange={e => setNights(clampInt(e.target.value))}
-            onBlur={e => setNights(clampInt(e.target.value, 1))}
+            onChange={e => setNights(Number(e.target.value))}
+            onBlur={e => setNights(Number(e.target.value))}
             className='w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm outline-none transition focus:border-gray-400 focus:ring-2 focus:ring-indigo-200'
           />
         </div>
