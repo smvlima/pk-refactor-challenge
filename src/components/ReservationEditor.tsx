@@ -51,14 +51,6 @@ const ReservationEditor: React.FC<ReservationEditorProps> = ({ id }) => {
       .finally(() => setLoading(false))
   }
 
-  if (loading) {
-    return (
-      <div className='w-full max-w-xl mx-auto p-4'>
-        <div className='text-sm text-gray-600'>Loading…</div>
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className='w-full max-w-xl mx-auto p-4'>
