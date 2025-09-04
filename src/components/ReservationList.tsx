@@ -25,11 +25,18 @@ const ReservationList: React.FC<{
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
   if (rows.length === 0 && loading) {
     getReservations()
-      .then((list: ReservationData[]) => {
-        setRows(list || [])
+      .then(({ data, page, perPage, totalPages }) => {
+        setRows(data || [])
+        setPage(page)
+        setPerPage(perPage)
+        setTotalPages(totalPages)
         setLoading(false)
       })
       .catch((e: any) => {
@@ -46,6 +53,9 @@ const ReservationList: React.FC<{
         (r.id || '').toLowerCase().includes(query.toLowerCase())
       )
 
+  const startIdx = (page - 1) * perPage + 1
+  const endIdx = Math.min(page * perPage, total)
+
   return (
     <div className='w-full max-w-7xl mx-auto p-4'>
       <div className='mb-4 flex items-center justify-between gap-3'>
@@ -53,12 +63,24 @@ const ReservationList: React.FC<{
           <h1 className='text-xl font-semibold tracking-tight'>Reservations</h1>
           <p className='text-sm text-gray-500'>Manage stays, guests, and balances</p>
         </div>
-        <input
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder='Search name, site, id…'
-          className='w-60 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-indigo-200'
-        />
+        <div className='flex items-center gap-3'>
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder='Search name, site, id…'
+            className='w-60 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-indigo-200'
+          />
+          <select
+            value={perPage}
+            onChange={e => { setPage(1); setPerPage(Number(e.target.value)) }}
+            className='rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-indigo-200'
+            aria-label='Rows per page'
+          >
+            {[10, 25, 50, 100].map(n => (
+              <option key={n} value={n}>{n} / page</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error && (
@@ -116,6 +138,44 @@ const ReservationList: React.FC<{
             })}
           </tbody>
         </table>
+        <div className='flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-200 bg-white'>
+          <div className='text-sm text-gray-600'>
+            {total > 0 ? `Showing ${startIdx}–${endIdx} of ${total}` : '—'}
+          </div>
+          <div className='flex items-center gap-2'>
+            <button
+              className='rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm disabled:opacity-50'
+              onClick={() => setPage(1)}
+              disabled={page <= 1 || loading}
+            >
+              First
+            </button>
+            <button
+              className='rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm disabled:opacity-50'
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page <= 1 || loading}
+            >
+              Prev
+            </button>
+            <span className='text-sm text-gray-700 px-2'>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              className='rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm disabled:opacity-50'
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages || loading}
+            >
+              Next
+            </button>
+            <button
+              className='rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm disabled:opacity-50'
+              onClick={() => setPage(totalPages)}
+              disabled={page >= totalPages || loading}
+            >
+              Last
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
