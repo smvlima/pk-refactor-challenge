@@ -7,13 +7,9 @@
 **Timebox:** 60 mins live (screen share).
 
 **Deliverables:**
-1. A PR with incremental commits.
-2. A 5–10 line `DECISIONS.md` explaining trade-offs.
-
-**Do:** improve types, split responsibilities, fix effects, lift/reuse logic, add 1–2 focused tests, preserve behavior.
-
-**Don’t:** add UI libraries, change visuals, or rewrite from scratch.
-
+1. List of refactor improvements
+2. Fix: state in list doesn't update on save
+3. Fix: pagination doesn't work
 
 ## Getting started
 ```bash

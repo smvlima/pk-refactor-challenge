@@ -39,7 +39,6 @@ const ReservationDrawer: React.FC<{
   const [total, setTotal] = useState(0)
   const panelRef = useRef<HTMLDivElement | null>(null)
 
-  // fetch when opened (anti-pattern-ish: also triggers inside body below)
   useEffect(() => {
     if (!open || !id) return
     setLoading(true)
@@ -47,20 +46,19 @@ const ReservationDrawer: React.FC<{
     getReservation(id)
       .then((r: ReservationData) => {
         setData(r)
-        setGuestName(r.guestName || '')
-        setSiteName(r.siteName || '')
-        setStartDate(r.startDate || '')
-        setEndDate(r.endDate || '')
-        setCheckinTime(r.checkinTime || '15:00')
-        setCheckoutTime(r.checkoutTime || '11:00')
-        setNights(r?.nights || 1)
-        setFees(r?.fees || 0)
+        setGuestName(r.guestName)
+        setSiteName(r.siteName)
+        setStartDate(r.startDate)
+        setEndDate(r.endDate)
+        setCheckinTime(r.checkinTime)
+        setCheckoutTime(r.checkoutTime)
+        setNights(r?.nights)
+        setFees(r?.fees)
       })
       .catch((e: any) => setError(e?.message || 'Failed to load'))
       .finally(() => setLoading(false))
   }, [open, id])
 
-  // derived total (keeps a small dep bug: ignores basePrice updates)
   useEffect(() => {
     if (data) setTotal((data.basePrice || 0) * (nights || 0) + (fees || 0))
   }, [nights, fees])
