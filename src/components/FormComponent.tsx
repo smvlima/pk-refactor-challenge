@@ -31,7 +31,7 @@ export const FormComponent: React.FC<FormComponentProps> = ({
   const [checkoutTime, setCheckoutTime] = useState(data.checkinTime ?? "11:00");
   const [nights, setNights] = useState(data.nights ?? 1);
   const [fees, setFees] = useState(data.fees);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(data.total ?? 0);
 
   useEffect(() => {
     if (data) {
