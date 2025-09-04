@@ -1,9 +1,14 @@
-import ReservationListPage from './components/ReservationListPage'
+import ReservationListPage from "./components/ReservationListPage";
 
 export default function App() {
   return (
-    <div style={{ margin: '2rem auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <ReservationListPage id="abc123" />
+    <div
+      style={{
+        margin: "2rem auto",
+        fontFamily: "Inter, system-ui, sans-serif",
+      }}
+    >
+      <ReservationListPage />
     </div>
-  )
+  );
 }
