@@ -1,45 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ReservationData } from "../models";
-import { getReservations } from "../api/fakeApi";
+import { getReservation, getReservations } from "../api/fakeApi";
+import { get } from "http";
 
-export const useReservations = () => {
-  const [rows, setRows] = useState<ReservationData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+interface useReservationProps {
+  id?: string | null;
+}
+
+export const useReservation = ({ id }: useReservationProps) => {
+  const [data, setData] = useState<ReservationData | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
 
-  const startIdx = (page - 1) * perPage + 1;
-  const endIdx = Math.min(page * perPage, total);
-
-  if (rows.length === 0 && isLoading) {
-    getReservations()
-      .then(({ data, page, perPage, totalPages }) => {
-        setRows(data || []);
-        setPage(page);
-        setPerPage(perPage);
-        setTotalPages(totalPages);
-        setIsLoading(false);
-      })
-      .catch((e: any) => {
-        setError(e?.message || "Failed to load reservations");
-        setIsLoading(false);
-      });
-  }
+  useEffect(() => {
+    if (id !== null && id !== undefined) {
+      setIsLoading(true);
+      setError(null);
+      getReservation(id)
+        .then((r: ReservationData) => {
+          setData(r);
+        })
+        .catch((err: any) => setError(err?.message))
+        .finally(() => setIsLoading(false));
+    }
+  }, [id]);
 
   return {
-    rows,
-    page,
-    perPage,
-    totalPages,
-    total,
-    startIdx,
-    endIdx,
+    data,
     isLoading,
     error,
-    setPage,
-    setPerPage,
   };
 };
