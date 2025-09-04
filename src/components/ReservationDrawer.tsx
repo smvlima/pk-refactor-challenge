@@ -16,7 +16,7 @@ export interface ReservationData {
 }
 
 const currency = (n: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n)
-const cls = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ')
+const classNames = (...xs: Array<string | false | null | undefined>) => xs.filter(Boolean).join(' ')
 
 const ReservationDrawer: React.FC<{
   open: boolean
@@ -61,7 +61,7 @@ const ReservationDrawer: React.FC<{
 
   useEffect(() => {
     if (data) setTotal((data.basePrice || 0) * (nights || 0) + (fees || 0))
-  }, [nights, fees])
+  }, [nights])
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -93,23 +93,21 @@ const ReservationDrawer: React.FC<{
   return (
     <div
       aria-hidden={!open}
-      className={cls(
+      className={classNames(
         'fixed inset-0 z-40 transition',
         open ? 'pointer-events-auto' : 'pointer-events-none'
       )}
     >
-      {/* backdrop */}
       <div
-        className={cls(
+        className={classNames(
           'absolute inset-0 bg-black/30 transition-opacity',
           open ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
       />
-      {/* panel */}
       <div
         ref={panelRef}
-        className={cls(
+        className={classNames(
           'absolute right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl outline-none transition-transform',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
