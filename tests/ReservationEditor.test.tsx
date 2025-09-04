@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ReservationEditor from '../src/components/ReservationEditor'
+import ReservationEditor from '../src/components/ReservationDrawer'
 
 function assertText(rx: RegExp) {
   expect(screen.getByText(rx)).toBeInTheDocument()
