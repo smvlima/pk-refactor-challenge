@@ -22,8 +22,7 @@ const ReservationDrawer: React.FC<{
   open: boolean
   id: string | null
   onClose: () => void
-  onSaved?: (r: ReservationData) => void
-}> = ({ open, id, onClose, onSaved }) => {
+}> = ({ open, id, onClose }) => {
   const [data, setData] = useState<ReservationData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -47,16 +46,10 @@ const ReservationDrawer: React.FC<{
       .then((r: ReservationData) => {
         setData(r)
         setGuestName(r.guestName)
-        setSiteName(r.siteName)
-        setStartDate(r.startDate)
-        setEndDate(r.endDate)
-        setCheckinTime(r.checkinTime)
-        setCheckoutTime(r.checkoutTime)
         setNights(r?.nights)
         setFees(r?.fees)
+        setLoading(false)
       })
-      .catch((e: any) => setError(e?.message || 'Failed to load'))
-      .finally(() => setLoading(false))
   }, [open, id])
 
   useEffect(() => {
@@ -83,7 +76,6 @@ const ReservationDrawer: React.FC<{
     saveReservation(payload)
       .then(() => {
         alert('saved')
-        onSaved && onSaved(payload)
         onClose()
       })
       .catch((err: any) => setFormError(err?.message || 'failed to save'))

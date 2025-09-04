@@ -115,11 +115,11 @@ const ReservationList: React.FC<{
               </tr>
             )}
 
-            {filtered.map(r => {
+            {filtered.map((r, i) => {
               const total = (r.basePrice || 0) * (r.nights || 0) + (r.fees || 0)
               return (
                 <tr
-                  key={r.id}
+                  key={i}
                   className='hover:bg-gray-50 cursor-pointer'
                   onClick={() => onOpen(r.id)}
                 >
